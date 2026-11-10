@@ -1,0 +1,9 @@
+# Dependências da tela de abertura (splash/logo.py e splash/login.py)
+Pillow>=10.0.0
+
+# Dependências do sistema web (webapp/) — ver também webapp/requirements.txt
+Flask==3.0.3
+Werkzeug==3.0.3
+pandas==2.3.3
+numpy==2.3.5
+opencv-contrib-python==4.13.0.92

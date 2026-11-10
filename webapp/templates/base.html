@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}GreenId{% endblock %} · GreenId</title>
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='img/GreenID_logo_rounded.png') }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">GreenId</span>
+    </div>
+    <nav class="nav">
+      {% if session.get('nivel_acesso', 0) >= 2 %}
+      <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint=='dashboard' }}">Painel</a>
+      {% endif %}
+      <a href="{{ url_for('consulta') }}" class="{{ 'active' if request.endpoint=='consulta' }}">Triagem de recuperação</a>
+      {% if session.get('nivel_acesso') == 3 %}
+      <div class="nav-divider">Administração</div>
+      <a href="{{ url_for('admin_usuarios') }}" class="{{ 'active' if request.endpoint=='admin_usuarios' }}">Usuários</a>
+      <a href="{{ url_for('admin_logs') }}" class="{{ 'active' if request.endpoint=='admin_logs' }}">Logs de segurança</a>
+      {% endif %}
+    </nav>
+    <div class="user-card">
+      <div class="user-avatar">{{ session.get('nome','?')[0] }}</div>
+      <div>
+        <div class="user-name">{{ session.get('nome') }}</div>
+        <div class="user-level">Nível {{ session.get('nivel_acesso') }}</div>
+      </div>
+    </div>
+    <a href="{{ url_for('logout') }}" class="logout-link">Sair</a>
+  </aside>
+  <main class="content">
+    {% include "_flashes.html" %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+</body>
+</html>

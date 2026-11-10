@@ -1,0 +1,20 @@
+{% extends "standalone_base.html" %}
+{% block title %}Autorizar cadastro de rosto{% endblock %}
+{% block content %}
+<div class="face-screen">
+  <div class="face-card">
+    <h2>Autorizar cadastro biométrico</h2>
+    <p class="muted">Você está prestes a vincular um rosto à conta de <strong>{{ usuario['nome'] }}</strong>
+      (nível 3). Por segurança, isso exige uma senha específica de cadastro, diferente da sua senha de login.</p>
+
+    <form method="POST" action="{{ url_for('iniciar_cadastro_face', user_id=usuario['id']) }}" style="text-align:left;">
+      <label for="senha_cadastro" class="small muted" style="display:block; margin-bottom:.3rem;">Senha de cadastro biométrico</label>
+      <input type="password" id="senha_cadastro" name="senha_cadastro" required autofocus placeholder="••••••••"
+             style="width:100%; padding:.75rem .85rem; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; font-size:.95rem;">
+      <button type="submit">Continuar para a câmera</button>
+    </form>
+
+    <a class="link-secundario" href="{{ url_for('admin_usuarios') }}">Cancelar e voltar</a>
+  </div>
+</div>
+{% endblock %}

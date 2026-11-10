@@ -1,0 +1,15 @@
+# Ambiente virtual (cada um recria com pip install -r requirements.txt)
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Banco local (usuários, logs, biometria) — gerado ao rodar o sistema
+webapp/instance/*.db
+webapp/faces/*
+!webapp/faces/.gitkeep
+!webapp/instance/.gitkeep
+
+.env
+.DS_Store
+Thumbs.db

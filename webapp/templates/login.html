@@ -1,0 +1,52 @@
+{% extends "standalone_base.html" %}
+{% block title %}Entrar{% endblock %}
+{% block content %}
+<div class="auth-screen">
+  <div class="auth-side">
+    <div class="auth-status">
+      <span class="auth-status__dot" aria-hidden="true"></span>
+      Sistema online
+    </div>
+
+    <div class="auth-logo-wrap">
+      <span class="auth-logo-glow" aria-hidden="true"></span>
+      <span class="brand-mark auth-logo-img" aria-hidden="true"></span>
+    </div>
+
+    <span class="eyebrow">Plataforma GEOCAU · Acesso restrito</span>
+    <h1>GreenId</h1>
+    <p>Consulta e gestão de Áreas Verdes Urbanas a partir do Cadastro Ambiental Urbano Geoespacial (GEOCAU).</p>
+
+    <ul class="auth-levels">
+      <li>
+        <span class="level-badge">01</span>
+        <div><strong>Nível 1</strong><span>Consulta geral dos dados ambientais</span></div>
+      </li>
+      <li>
+        <span class="level-badge">02</span>
+        <div><strong>Nível 2</strong><span>Informações restritas à direção</span></div>
+      </li>
+      <li>
+        <span class="level-badge level-badge--secure">03</span>
+        <div><strong>Nível 3</strong><span>Administração — senha + biometria facial</span></div>
+      </li>
+    </ul>
+  </div>
+  <div class="auth-form-wrap">
+    <form class="auth-form" method="POST" action="{{ url_for('login') }}">
+      <span class="auth-form__tag">Acesso seguro</span>
+      <h2>Entrar no sistema</h2>
+      <p class="muted small">Use suas credenciais de acesso para continuar.</p>
+      <label for="username">Usuário</label>
+      <input type="text" id="username" name="username" autocomplete="username" required autofocus placeholder="ex.: usuario1">
+      <label for="senha">Senha</label>
+      <input type="password" id="senha" name="senha" autocomplete="current-password" required placeholder="••••••••">
+      <button type="submit">Entrar</button>
+      <div class="auth-hint">
+        Demonstração — senha <code>1234</code> para todos:<br>
+        <code>usuario1</code> (nível 1) · <code>diretor1</code> (nível 2) · <code>admin</code> (nível 3, facial)
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

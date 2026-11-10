@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Triagem de recuperação{% endblock %}
+{% block content %}
+<header class="page-header"><span class="eyebrow">Dados ambientais</span><h1>Triagem de recuperação</h1><p class="muted">{% if nivel >= 2 %}Pesquise áreas e ordene a lista pelo índice de prioridade. A abertura da ficha mostra os principais dados ambientais registrados.{% else %}Pesquise as áreas verdes cadastradas. A abertura da ficha mostra os principais dados ambientais registrados.{% endif %}</p></header>
+<form class="filter-bar filter-grid" method="GET">
+  <input name="q" value="{{filtros.q}}" placeholder="Buscar pelo nome da área">
+  <select name="uf"><option value="">Todas as UFs</option>{% for x in ufs %}<option value="{{x}}" {{'selected' if x==filtros.uf}}>{{x}}</option>{% endfor %}</select>
+  <select name="municipio"><option value="">Todos os municípios</option>{% for x in municipios %}<option value="{{x}}" {{'selected' if x==filtros.municipio}}>{{x}}</option>{% endfor %}</select>
+  <select name="tipo"><option value="">Todas as tipologias</option>{% for x in tipos %}<option value="{{x}}" {{'selected' if x==filtros.tipo}}>{{x}}</option>{% endfor %}</select>
+  <select name="situacao"><option value="">Todas as situações</option>{% for x in situacoes %}<option value="{{x}}" {{'selected' if x==filtros.situacao}}>{{x}}</option>{% endfor %}</select>
+  {% if nivel >= 2 %}<select name="prioridade"><option value="">Todas as prioridades</option><option {{'selected' if filtros.prioridade=='Alta'}} value="Alta">Alta</option><option {{'selected' if filtros.prioridade=='Média'}} value="Média">Média</option><option {{'selected' if filtros.prioridade=='Baixa'}} value="Baixa">Baixa</option></select>{% endif %}
+  <select name="projeto"><option value="">Projeto de melhoria: todos</option><option value="Sim" {{'selected' if filtros.projeto=='Sim'}}>Com projeto</option><option value="Não" {{'selected' if filtros.projeto=='Não'}}>Sem projeto</option></select>
+  <button type="submit">Filtrar</button><a class="btn-secondary" href="{{url_for('consulta')}}">Limpar</a>
+</form>
+<div class="result-head"><span>{{total}} resultado(s) no total — mostrando {{resultados|length}} (página {{pagina}} de {{total_paginas}})</span>{% if nivel >= 2 %}<span class="muted">Ordenação: maior prioridade primeiro</span>{% endif %}</div>
+<div class="table-wrap"><table class="data-table"><thead><tr><th>Área</th><th>Localização</th><th>Tipologia</th><th>Área verde</th><th>A recuperar</th>{% if nivel >= 2 %}<th>Índice</th><th>Prioridade</th>{% endif %}<th></th></tr></thead><tbody>{% for r in resultados %}<tr><td><strong>{{r['nome_area'] or 'Sem nome'}}</strong><br><small>#{{r['id_area']}}</small></td><td>{{r['municipio'] or 'Não informado'}}{% if r['uf'] %} · {{r['uf']}}{% endif %}</td><td><span class="tipologia-tag">{{r['tipo'] or 'Não informado'}}</span></td><td>{{r['area_m2_num']|format_m2}}</td><td>{{r['area_recuperar_m2']|format_m2}}</td>{% if nivel >= 2 %}<td><b>{{'%.1f'|format(r['indice_recuperacao'])}}</b></td><td><span class="priority-badge priority-{{r['prioridade']|lower|replace('é','e')}}">{{r['prioridade']}}</span></td>{% endif %}<td><a class="btn-mini-link" href="{{url_for('area_detalhe',area_id=r['id_area'])}}">Ver ficha</a></td></tr>{% else %}<tr><td colspan="{{ 8 if nivel >= 2 else 6 }}" class="empty">Nenhum registro encontrado.</td></tr>{% endfor %}</tbody></table></div>
+{% set endpoint = 'consulta' %}
+{% set extra_args = filtros_ativos %}
+{% include "_paginacao.html" %}
+{% endblock %}

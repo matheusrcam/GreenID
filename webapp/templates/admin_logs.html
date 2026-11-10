@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Logs de segurança{% endblock %}
+{% block content %}
+<header class="page-header">
+  <h1>Logs de acesso e segurança</h1>
+  <p class="muted">Registro de tentativas de login, verificações biométricas e acessos negados. {{total}} registro(s) no total.</p>
+</header>
+
+<div class="table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr><th>Quando</th><th>Usuário</th><th>Evento</th><th>Resultado</th><th>Detalhes</th><th>IP</th></tr>
+    </thead>
+    <tbody>
+      {% for log in logs %}
+        <tr class="{{ 'row-erro' if not log['sucesso'] }}">
+          <td>{{ log['timestamp'][:19].replace('T',' ') }}</td>
+          <td>{{ log['usuario'] or '—' }}</td>
+          <td>{{ log['tipo_evento'] }}</td>
+          <td>{{ '✅ sucesso' if log['sucesso'] else '⛔ falha' }}</td>
+          <td>{{ log['detalhes'] }}</td>
+          <td>{{ log['ip_origem'] or '—' }}</td>
+        </tr>
+      {% else %}
+        <tr><td class="empty" colspan="6">Nenhum log registrado ainda.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% set endpoint = 'admin_logs' %}
+{% include "_paginacao.html" %}
+{% endblock %}

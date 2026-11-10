@@ -1,0 +1,24 @@
+{% set _extra = extra_args|default({}) %}
+{% if total_paginas > 1 %}
+<nav class="pagination" aria-label="Paginação">
+  {% if pagina > 1 %}
+    <a class="page-nav" href="{{ url_for(endpoint, pagina=pagina-1, **_extra) }}">‹ Anterior</a>
+  {% else %}
+    <span class="page-nav disabled">‹ Anterior</span>
+  {% endif %}
+
+  <span class="page-info">Página <strong>{{ pagina }}</strong> de <strong>{{ total_paginas }}</strong> <span class="muted">({{ total }} resultado(s))</span></span>
+
+  {% if pagina < total_paginas %}
+    <a class="page-nav" href="{{ url_for(endpoint, pagina=pagina+1, **_extra) }}">Próxima ›</a>
+  {% else %}
+    <span class="page-nav disabled">Próxima ›</span>
+  {% endif %}
+
+  <form class="page-jump" method="GET" action="{{ url_for(endpoint) }}">
+    {% for k, v in _extra.items() %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endfor %}
+    <label>Ir para <input type="number" name="pagina" min="1" max="{{ total_paginas }}" value="{{ pagina }}"></label>
+    <button type="submit">Ir</button>
+  </form>
+</nav>
+{% endif %}

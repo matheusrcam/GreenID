@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Usuários{% endblock %}
+{% block content %}
+<header class="page-header">
+  <h1>Usuários do sistema</h1>
+  <p class="muted">Área administrativa — acesso restrito ao Nível 3.</p>
+</header>
+
+<div class="table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr><th>ID</th><th>Nome</th><th>Usuário</th><th>Nível</th><th>Face cadastrada</th><th>Criado em</th><th>Ações</th></tr>
+    </thead>
+    <tbody>
+      {% for u in usuarios %}
+        <tr>
+          <td>{{ u['id'] }}</td>
+          <td>{{ u['nome'] }}</td>
+          <td>{{ u['username'] }}</td>
+          <td><span class="badge badge-nivel{{ u['nivel_acesso'] }}">Nível {{ u['nivel_acesso'] }}</span></td>
+          <td>{{ 'Sim' if u['face_cadastrada'] else '—' }}</td>
+          <td>{{ u['criado_em'][:16].replace('T',' ') }}</td>
+          <td>
+            {% if u['nivel_acesso'] == 3 %}
+              <div style="display:flex; gap:.4rem; flex-wrap:wrap;">
+                <a href="{{ url_for('iniciar_cadastro_face', user_id=u['id']) }}" class="btn-mini-link">
+                  {{ 'Adicionar rosto' if u['face_cadastrada'] else 'Cadastrar rosto' }}
+                </a>
+                {% if u['face_cadastrada'] %}
+                  <form method="POST" action="{{ url_for('excluir_face_usuario', user_id=u['id']) }}"
+                        onsubmit="return confirm('Excluir o(s) rosto(s) cadastrado(s) de {{ u['nome'] }}? Ele(a) vai precisar recadastrar no próximo login.');">
+                    <button type="submit" class="btn-excluir-face">Excluir rosto</button>
+                  </form>
+                {% endif %}
+              </div>
+            {% else %}
+              <span class="muted small">—</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

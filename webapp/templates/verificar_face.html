@@ -1,0 +1,79 @@
+{% extends "standalone_base.html" %}
+{% block title %}Verificação facial{% endblock %}
+{% block content %}
+<div class="face-screen">
+  <div class="face-card" id="face-card">
+    <h2>Verificação de identidade</h2>
+    <p class="muted">Olá, <strong>{{ usuario['nome'] }}</strong>. Este é um acesso de <strong>Nível 3</strong>
+      e exige confirmação por reconhecimento facial.</p>
+
+    {% if not tem_cadastro %}
+      <div class="notice">
+        Nenhuma face cadastrada para este usuário ainda.
+        <a href="{{ url_for('cadastrar_face') }}">Cadastrar rosto agora</a>.
+      </div>
+    {% else %}
+      <div class="camera-box">
+        <video id="video" autoplay playsinline></video>
+        <canvas id="canvas" class="hidden"></canvas>
+      </div>
+      <button type="button" id="btn-capturar">Verificar identidade</button>
+      <p class="face-status" id="status"></p>
+      <a class="link-secundario" href="{{ url_for('cadastrar_face') }}">Recadastrar meu rosto</a>
+    {% endif %}
+    <a class="link-secundario" href="{{ url_for('logout') }}">Cancelar e sair</a>
+  </div>
+
+  <div class="access-granted hidden" id="acesso-liberado">
+    <div class="access-granted__ring">
+      <svg viewBox="0 0 52 52" class="access-granted__check">
+        <circle cx="26" cy="26" r="24" fill="none"/>
+        <path fill="none" d="M14 27l7 7 17-17"/>
+      </svg>
+    </div>
+    <h2>Acesso liberado!</h2>
+    <p class="muted">Identidade confirmada. Entrando no sistema…</p>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/camera.js') }}"></script>
+<script>
+  iniciarCamera('video');
+
+  const btn = document.getElementById('btn-capturar');
+  btn?.addEventListener('click', async () => {
+    const status = document.getElementById('status');
+    status.textContent = 'Analisando rosto...';
+    btn.disabled = true;
+
+    const dataUrl = capturarFrame('video', 'canvas');
+
+    try {
+      const resp = await fetch("{{ url_for('verificar_face') }}", {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'imagem=' + encodeURIComponent(dataUrl)
+      });
+      const data = await resp.json();
+
+      if (!data.ok) {
+        status.textContent = '⚠️ ' + data.mensagem;
+        btn.disabled = false;
+        return;
+      }
+
+      mostrarAcessoLiberado(data.redirect);
+    } catch (e) {
+      status.textContent = '⚠️ Erro de conexão. Tente novamente.';
+      btn.disabled = false;
+    }
+  });
+
+  function mostrarAcessoLiberado(redirectUrl) {
+    document.getElementById('face-card').classList.add('hidden');
+    const overlay = document.getElementById('acesso-liberado');
+    overlay.classList.remove('hidden');
+    overlay.classList.add('access-granted--show');
+    setTimeout(() => { window.location.href = redirectUrl; }, 1700);
+  }
+</script>
+{% endblock %}

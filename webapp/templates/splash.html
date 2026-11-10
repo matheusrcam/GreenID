@@ -1,0 +1,21 @@
+{% extends "standalone_base.html" %}
+{% block title %}GreenId{% endblock %}
+{% block content %}
+<div class="splash-screen" id="splash-screen">
+  <button type="button" class="splash-logo-btn" id="splash-logo-btn" aria-label="Entrar no GreenId">
+    <span class="splash-glow" aria-hidden="true"></span>
+    <img class="splash-logo-img" src="{{ url_for('static', filename='img/GreenID_logo_rounded.png') }}" alt="Logo GreenId">
+  </button>
+  <div class="splash-brand"><span>Green</span><span>ID</span></div>
+  <div class="splash-underline"></div>
+  <p class="splash-hint">Clique na logo para entrar</p>
+</div>
+<script>
+  const btn = document.getElementById('splash-logo-btn');
+  const tela = document.getElementById('splash-screen');
+  btn.addEventListener('click', () => {
+    tela.classList.add('leaving');
+    setTimeout(() => { window.location.href = "{{ url_for('login') }}"; }, 400);
+  });
+</script>
+{% endblock %}

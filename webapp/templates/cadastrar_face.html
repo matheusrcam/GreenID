@@ -1,0 +1,63 @@
+{% extends "standalone_base.html" %}
+{% block title %}Cadastrar rosto{% endblock %}
+{% block content %}
+<div class="face-screen">
+  <div class="face-card">
+    <h2>Cadastro biométrico</h2>
+    {% if modo_admin %}
+      <p class="muted">Adicionando um rosto à conta de <strong>{{ usuario['nome'] }}</strong> (nível 3).
+        Capture pelo menos <strong>{{ minimo }}</strong> fotos, em ângulos levemente diferentes e boa iluminação.</p>
+    {% else %}
+      <p class="muted">Usuário <strong>{{ usuario['nome'] }}</strong>. Capture pelo menos
+        <strong>{{ minimo }}</strong> fotos do seu rosto, em ângulos levemente diferentes e boa iluminação.</p>
+    {% endif %}
+
+    <div class="camera-box">
+      <video id="video" autoplay playsinline></video>
+      <canvas id="canvas" class="hidden"></canvas>
+    </div>
+
+    <button type="button" id="btn-capturar">Capturar foto</button>
+    <p class="face-status" id="status">Fotos cadastradas: <span id="contador">{{ total }}</span> / {{ minimo }}</p>
+    <progress id="progresso" max="{{ minimo }}" value="{{ total }}"></progress>
+
+    <a class="link-secundario" id="link-continuar"
+       href="{{ url_for('admin_usuarios') if modo_admin else url_for('verificar_face') }}"
+       style="{{ '' if total >= minimo else 'pointer-events:none;opacity:.4;' }}">
+      {{ 'Concluir e voltar para Usuários →' if modo_admin else 'Concluir e ir para verificação →' }}
+    </a>
+    <a class="link-secundario" href="{{ url_for('cancelar_cadastro_face') }}">Cancelar e sair</a>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/camera.js') }}"></script>
+<script>
+  iniciarCamera('video');
+  const minimo = {{ minimo }};
+  const linkContinuar = document.getElementById('link-continuar');
+
+  document.getElementById('btn-capturar').addEventListener('click', async () => {
+    const status = document.getElementById('status');
+    const dataUrl = capturarFrame('video', 'canvas');
+    const resp = await fetch("{{ url_for('cadastrar_face') }}", {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: 'imagem=' + encodeURIComponent(dataUrl)
+    });
+    const data = await resp.json();
+    if (!data.ok) {
+      status.innerHTML = '⚠️ ' + data.mensagem;
+      return;
+    }
+    document.getElementById('contador').textContent = data.total;
+    document.getElementById('progresso').value = data.total;
+    status.innerHTML = 'Fotos cadastradas: <span id="contador">' + data.total + '</span> / ' + minimo;
+
+    if (data.concluido) {
+      linkContinuar.style.pointerEvents = 'auto';
+      linkContinuar.style.opacity = '1';
+      if (data.proxima_url) linkContinuar.href = data.proxima_url;
+      status.innerHTML += '<br>Cadastro concluído com sucesso!';
+    }
+  });
+</script>
+{% endblock %}
